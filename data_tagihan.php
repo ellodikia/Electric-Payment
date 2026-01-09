@@ -1,6 +1,5 @@
 <?php
 include 'koneksi.php';
-session_start(); 
 
 if (isset($_GET['bayar_id'])) {
     $id_tagihan = mysqli_real_escape_string($koneksi, $_GET['bayar_id']);
@@ -25,14 +24,17 @@ if (isset($_GET['bayar_id'])) {
             
             echo "<script>
                     alert('Pembayaran Berhasil!');
-                    window.location='data_tagihan.php'; 
+                    window.location='index.php?page=tagihan'; 
                   </script>";
             exit;
         }
     }
 }
 
-$query = mysqli_query($koneksi, "SELECT * FROM payment_tagihan ORDER BY id DESC");
+$query = mysqli_query($koneksi, "SELECT t.*, p.id_bayar 
+                                 FROM payment_tagihan t 
+                                 LEFT JOIN payment_pembayaran p ON t.id_pelanggan = p.id_pelanggan AND t.bulan = p.bulanbayar
+                                 ORDER BY t.id DESC");
 ?>
 
 <?php if (isset($_SESSION['cetak_id'])) : ?>
@@ -43,156 +45,79 @@ $query = mysqli_query($koneksi, "SELECT * FROM payment_tagihan ORDER BY id DESC"
     unset($_SESSION['cetak_id']);
 endif; 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="image/logo.png" type="" />
-    <title>Data Tagihan | Electro Payment</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="js/bootstrap.bundle.min.js"></script>
 
-    <style>
-        .navbar-light .navbar-nav .nav-link {
-            color: rgba(0,0,0,.9);
-            font-weight: 500;
-        }
-        .btn-add-tagihan {
-            background-color: #8BC34A;
-            color: white !important;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-weight: bold;
-            display: inline-block;
-            text-decoration: none;
-            transition: 0.3s;
-            border: none;
-        }
-        .btn-add-tagihan:hover {
-            background-color: #689F38;
-        }
-        .btn-search {
-            background-color: #03A9F4;
-            color: white !important;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .card-table {
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            border-radius: 10px;
-        }
-        .badge-lunas {
-            background-color: #d1e7dd;
-            color: #0f5132;
-            border: 1px solid #badbcc;
-        }
-    </style>
-</head>
-
-<body class="bg-light">
-
-<nav class="navbar navbar-light bg-light shadow-sm sticky-top">
-    <div class="container-fluid">
-        <a class="navbar-brand fw-bold">Electro Payment <i class="fa-solid fa-bolt"></i></a>
-        <div class="d-flex">
-            <a href="index.php" class="btn btn-primary me-2 d-flex align-items-center">
-                Admin <i class="fa-solid fa-user-tie ms-2"></i>
-            </a>
-            <a href="logout.php" class="btn btn-secondary d-flex align-items-center">
-                Keluar <i class="fa-solid fa-right-from-bracket ms-2"></i>
-            </a>
-        </div>
+<div class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 animate-fadeIn">
+    <div>
+        <h2 class="text-3xl md:text-5xl font-black uppercase italic tracking-tighter text-white">
+            Billing <span class="text-yellow-400">& Tagihan</span>
+        </h2>
+        <p class="text-gray-400 mt-2 font-medium text-sm">Kelola penagihan pelanggan dan proses pembayaran instan.</p>
     </div>
-</nav>
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light mt-3 shadow-sm">
-    <div class="container-fluid">
-        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.php"><i class="fa-solid fa-house-user me-1"></i> Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_pelanggan.php"><i class="fa-solid fa-tachograph-digital me-1"></i> Data Pelanggan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_pembayaran.php"><i class="fa-solid fa-tag me-1"></i> Data Pembayaran</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_tarif.php"><i class="fa-solid fa-rupiah-sign me-1"></i> Data Tarif</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_penggunaan.php"><i class="fa-solid fa-database me-1"></i> Data Penggunaan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_tagihan.php"><i class="fa-solid fa-server me-1"></i> Data Tagihan</a>
-                    </li>
-                </ul>
-            </div>
-    </div>
-</nav>
-
-<div class="container mt-4">
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <a href="#" class="btn-search"><i class="fa-solid fa-search me-1"></i> Cari Tagihan</a>
-    </div>
-
-    <div class="card card-table p-3 bg-white mb-5">
-        <h4 class="mb-3 fw-bold">Daftar Tagihan Pelanggan</h4>
-
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped align-middle">
-                <thead class="table-dark text-center">
-                    <tr>
-                        <th>No</th>
-                        <th>ID Pelanggan</th>
-                        <th>Bulan/Tahun</th>
-                        <th>Jumlah Meter</th>
-                        <th>Total Tagihan</th>
-                        <th>Status / Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php
-                    $no = 1;
-                    while ($row = mysqli_fetch_array($query)) {
-                ?>
-                    <tr>
-                        <td class="text-center"><?= $no++; ?></td>
-                        <td class="fw-bold text-primary"><?= $row['id_pelanggan']; ?></td>
-                        <td><?= $row['bulan'] . " " . $row['tahun']; ?></td>
-                        <td class="text-center"><?= $row['jumlahmeter']; ?> kWh</td>
-                        <td class="fw-bold text-success">Rp <?= number_format($row['jumlahtagihan'], 0, ',', '.'); ?></td>
-                        <td class="text-center">
-                            <?php if ($row['status'] == 1) : ?>
-                                <span class="badge badge-lunas px-3 py-2 rounded-pill">
-                                    <i class="fa-solid fa-check-circle me-1"></i> Lunas
-                                </span>
-                            <?php else : ?>
-                                <a href="?bayar_id=<?= $row['id']; ?>" 
-                                   class="btn btn-warning btn-sm fw-bold px-3"
-                                   onclick="return confirm('Proses pembayaran tagihan ini?')">
-                                   <i class="fa-solid fa-credit-card me-1"></i> Bayar Sekarang
-                                </a>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                <?php } ?>
-                </tbody>
-            </table>
+    <div class="flex gap-3 w-full md:w-auto">
+        <div class="relative group w-full md:w-64">
+            <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            <input type="text" placeholder="Cari ID Pelanggan..." class="w-full bg-[#1e1e1e] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-xs font-bold text-white focus:outline-none focus:border-yellow-400 transition">
         </div>
     </div>
 </div>
 
-</body>
-</html>
+<div class="bg-[#1e1e1e] rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl relative">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-[#252525] border-b border-white/5">
+                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em] text-center w-16">No</th>
+                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em]">Pelanggan</th>
+                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em] text-center">Periode</th>
+                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em] text-center">Konsumsi</th>
+                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em]">Total Tagihan</th>
+                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em] text-center">Status / Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5">
+                <?php
+                $no = 1;
+                while ($row = mysqli_fetch_array($query)) {
+                ?>
+                <tr class="hover:bg-white/[0.02] transition-colors group">
+                    <td class="px-6 py-6 text-sm font-black text-gray-600 text-center"><?= $no++; ?></td>
+                    <td class="px-6 py-6">
+                        <span class="bg-[#121212] px-3 py-1.5 rounded-lg border border-white/5 font-mono text-xs font-bold text-yellow-400 tracking-wider">
+                            <?= $row['id_pelanggan']; ?>
+                        </span>
+                    </td>
+                    <td class="px-6 py-6 text-center text-xs font-bold text-white uppercase italic">
+                        <?= $row['bulan']; ?> <span class="text-gray-500 not-italic"><?= $row['tahun']; ?></span>
+                    </td>
+                    <td class="px-6 py-6 text-center">
+                        <span class="text-white font-black"><?= $row['jumlahmeter']; ?></span>
+                        <span class="text-[10px] text-gray-500 font-bold ml-1">kWh</span>
+                    </td>
+                    <td class="px-6 py-6">
+                        <span class="text-yellow-400 font-black italic text-sm">Rp <?= number_format($row['jumlahtagihan'], 0, ',', '.'); ?></span>
+                    </td>
+                    <td class="px-6 py-6 text-center">
+                        <?php if ($row['status'] == 1) : ?>
+                            <div class="flex items-center justify-center gap-2">
+                                <div class="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 text-green-500 rounded-xl border border-green-500/20 shadow-lg shadow-green-500/5">
+                                    <i class="fa-solid fa-circle-check text-[10px]"></i>
+                                    <span class="text-[10px] font-black uppercase tracking-widest">PAID</span>
+                                </div>
+                                <a href="cetak_struk.php?id=<?= $row['id_bayar']; ?>" target="_blank" class="w-10 h-10 flex items-center justify-center bg-[#121212] hover:bg-white text-gray-500 hover:text-black rounded-xl transition-all border border-white/5 shadow-lg">
+                                    <i class="fa-solid fa-print text-xs"></i>
+                                </a>
+                            </div>
+                        <?php else : ?>
+                            <a href="index.php?page=tagihan&bayar_id=<?= $row['id']; ?>" 
+                               onclick="return confirm('Konfirmasi pembayaran untuk ID <?= $row['id_pelanggan']; ?>?')"
+                               class="inline-flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-xl font-black text-[10px] transition transform hover:scale-105 uppercase tracking-widest shadow-lg shadow-yellow-400/20">
+                                <i class="fa-solid fa-money-bill-wave"></i> Bayar Sekarang
+                            </a>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <?php } ?>
+            </tbody>
+        </table>
+    </div>
+</div>

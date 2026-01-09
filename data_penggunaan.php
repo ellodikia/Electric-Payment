@@ -1,157 +1,86 @@
 <?php
-include 'koneksi.php';
-
+// Query data penggunaan
 $query = mysqli_query($koneksi, "SELECT * FROM payment_penggunaan ORDER BY id DESC") or die(mysqli_error($koneksi));
-$is_admin = isset($_SESSION['admin']) && $_SESSION['admin'] === true;
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="image/logo.png" type="" />
-    <title>Data Tarif | Electro Payment</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="js/bootstrap.bundle.min.js"></script>
-
-    <style>
-        .navbar-light .navbar-nav .nav-link {
-            color: rgba(0,0,0,.9);
-            font-weight: 500;
-        }
-        .btn-add {
-            background-color: #8BC34A;
-            color: white !important;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-weight: bold;
-            display: inline-block;
-            text-decoration: none;
-            transition: 0.3s;
-        }
-        .btn-add:hover {
-            background-color: #689F38;
-            color: white !important;
-        }
-        .btn-search {
-            background-color: #03A9F4;
-            color: white !important;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-block;
-            transition: 0.3s;
-        }
-        .btn-search:hover {
-            background-color: #0288D1;
-        }
-        .card-table {
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            border-radius: 10px;
-        }
-    </style>
-</head>
-
-<body>
-
-<nav class="navbar navbar-light bg-light shadow-sm sticky-top">
-    <div class="container-fluid">
-        <a class="navbar-brand fw-bold">Electro Payment <i class="fa-solid fa-bolt"></i></a>
-        <div class="d-flex">
-            <a href="index.php" class="btn btn-primary me-2 d-flex align-items-center">
-                Admin <i class="fa-solid fa-user-tie ms-2"></i>
-            </a>
-            <a href="logout.php" class="btn btn-secondary d-flex align-items-center">
-                Keluar <i class="fa-solid fa-right-from-bracket ms-2"></i>
-            </a>
-        </div>
+<div class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 animate-fadeIn">
+    <div>
+        <h2 class="text-3xl md:text-5xl font-black uppercase italic tracking-tighter text-white">
+            Data <span class="text-yellow-400">Penggunaan</span>
+        </h2>
+        <p class="text-gray-400 mt-2 font-medium text-sm">Monitoring angka meteran pelanggan setiap periode bulan.</p>
     </div>
-</nav>
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light mt-3 shadow-sm">
-    <div class="container-fluid">
-        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.php"><i class="fa-solid fa-house-user me-1"></i> Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_pelanggan.php"><i class="fa-solid fa-tachograph-digital me-1"></i> Data Pelanggan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_pembayaran.php"><i class="fa-solid fa-tag me-1"></i> Data Pembayaran</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_tarif.php"><i class="fa-solid fa-rupiah-sign me-1"></i> Data Tarif</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_penggunaan.php"><i class="fa-solid fa-database me-1"></i> Data Penggunaan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_tagihan.php"><i class="fa-solid fa-server me-1"></i> Data Tagihan</a>
-                    </li>
-                </ul>
-            </div>
+    <div class="flex gap-3 w-full md:w-auto">
+        <a href="form_add_penggunaan.php" class="flex-grow md:flex-none flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-4 rounded-2xl font-black text-xs transition transform hover:scale-105 shadow-xl shadow-yellow-400/10 uppercase tracking-widest">
+            <i class="fa-solid fa-plus text-base"></i> Tambah Penggunaan
+        </a>
     </div>
-</nav>
+</div>
 
-<div class="container mt-4">
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <a href="form_add_penggunaan.php" class="btn-add"><i class="fa-solid fa-plus me-1"></i> Tambah Data</a>
-        <a href="#" class="btn-search"><i class="fa-solid fa-search me-1"></i> Cari Data</a>
-    </div>
-
-    <div class="card card-table p-3">
-        <h4 class="mb-3 fw-bold">Data Tarif</h4>
-
-        <table class="table table-bordered table-striped">
-            <thead class="table-dark text-center">
-                <tr>
-                    <th>No</th>
-                    <th>ID Pelanggan</th>
-                    <th>Bulan</th>
-                    <th>Tahun</th>
-                    <th>Meter Awal</th>
-                    <th>Meter Akhir</th>
-                    <th>Action</th>
+<div class="bg-[#1e1e1e] rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl relative group">
+    <div class="absolute -top-10 -left-10 w-40 h-40 bg-blue-400/5 rounded-full blur-3xl group-hover:bg-blue-400/10 transition"></div>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-[#252525] border-b border-white/5">
+                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em] text-center w-16">No</th>
+                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em]">ID Pelanggan</th>
+                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em] text-center">Periode</th>
+                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em] text-center">Meter Awal</th>
+                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em] text-center">Meter Akhir</th>
+                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em] text-center">Pemakaian</th>
+                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em] text-center">Aksi</th>
                 </tr>
             </thead>
-
-            <tbody>
-            <?php
+            <tbody class="divide-y divide-white/5">
+                <?php
                 $no = 1;
-                while ($row = mysqli_fetch_array($query)) {
-                    echo "<tr>";
-                    echo "<td class='text-center'>{$no}</td>";
-                    echo "<td>{$row['id_pelanggan']}</td>";
-                    echo "<td>{$row['bulan']}</td>";
-                    echo "<td>{$row['tahun']}</td>";
-                    echo "<td>{$row['meterawal']}</td>";
-                    echo "<td>{$row['meterakhir']}</td>";
-
-                    echo "<td class='text-center'>
-                        <a href='form_edit_penggunaan.php?Id={$row['id']}' class='text-primary fw-bold me-2'>Edit</a>
-                        <a href='delete_data_penggunaan.php?Id={$row['id']}' class='text-danger fw-bold' onclick=\"return confirm('Yakin hapus data ini?')\">Hapus</a>
-                    </td>";
-
-                    echo "</tr>";
-                    $no++;
+                if(mysqli_num_rows($query) > 0) {
+                    while ($row = mysqli_fetch_array($query)) {
+                        $pemakaian = $row['meterakhir'] - $row['meterawal'];
+                ?>
+                <tr class="hover:bg-white/[0.02] transition-colors group">
+                    <td class="px-6 py-6 text-sm font-black text-gray-600 text-center"><?= $no++; ?></td>
+                    <td class="px-6 py-6">
+                        <span class="bg-[#121212] px-3 py-1.5 rounded-lg border border-white/5 font-mono text-xs font-bold text-yellow-400 tracking-wider">
+                            <?= $row['id_pelanggan']; ?>
+                        </span>
+                    </td>
+                    <td class="px-6 py-6 text-center">
+                        <div class="text-white font-bold text-xs uppercase"><?= $row['bulan']; ?></div>
+                        <div class="text-[10px] text-gray-500 font-black"><?= $row['tahun']; ?></div>
+                    </td>
+                    <td class="px-6 py-6 text-center text-gray-400 font-mono text-sm"><?= $row['meterawal']; ?></td>
+                    <td class="px-6 py-6 text-center text-gray-400 font-mono text-sm"><?= $row['meterakhir']; ?></td>
+                    <td class="px-6 py-6 text-center">
+                        <span class="text-white font-black"><?= $pemakaian; ?></span>
+                        <span class="text-[10px] text-gray-500 font-bold uppercase ml-1 text-xs">kWh</span>
+                    </td>
+                    <td class="px-6 py-6">
+                        <div class="flex items-center justify-center gap-2">
+                            <a href="form_edit_penggunaan.php?Id=<?= $row['id']; ?>" class="w-10 h-10 flex items-center justify-center bg-[#121212] hover:bg-white text-gray-500 hover:text-black rounded-xl transition-all border border-white/5 shadow-lg">
+                                <i class="fa-solid fa-pen-to-square text-xs"></i>
+                            </a>
+                            <a href="delete_data_penggunaan.php?Id=<?= $row['id']; ?>" onclick="return confirm('Yakin hapus data ini?')" class="w-10 h-10 flex items-center justify-center bg-[#121212] hover:bg-red-500 text-gray-500 hover:text-white rounded-xl transition-all border border-white/5 shadow-lg">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <?php
+                    }
+                } else {
+                    echo "<tr><td colspan='7' class='px-6 py-10 text-center text-gray-500 italic'>Belum ada data penggunaan.</td></tr>";
                 }
-            ?>
+                ?>
             </tbody>
         </table>
     </div>
 
+    <div class="bg-[#252525] px-8 py-5 border-t border-white/5">
+        <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">
+            Total Record Penggunaan: <span class="text-white"><?= mysqli_num_rows($query); ?> Periode</span>
+        </p>
+    </div>
 </div>
-
-
-</body>
-</html>
