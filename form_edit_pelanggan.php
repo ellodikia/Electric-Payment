@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['user'])) {
+    header("Location: login.php");
+    exit();
+}
 include "koneksi.php";
 
 $id = (int) $_GET['Id']; 
@@ -12,145 +17,154 @@ if (!$data) {
 
 $tarif = mysqli_query($koneksi, "SELECT kodetarif, daya FROM payment_tarif");
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="image/logo.png" type="" />
-    <title>Edit Data Pelanggan</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="js/bootstrap.bundle.min.js"></script>
+    <link rel="icon" href="image/logo.png" type="image/png" />
+    <title>Edit Pelanggan | Electro Payment</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+
     <style>
-        .navbar-light .navbar-nav .nav-link {
-            color: rgba(0,0,0,.9);
-            font-weight: 500;
-        }
-        .btn-add {
-            background-color: #8BC34A;
-            color: white !important;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-weight: bold;
-            display: inline-block;
-            text-decoration: none;
-            transition: 0.3s;
-        }
-        .btn-add:hover {
-            background-color: #689F38;
-            color: white !important;
-        }
-        .btn-search {
-            background-color: #03A9F4;
-            color: white !important;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-block;
-            transition: 0.3s;
-        }
-        .btn-search:hover {
-            background-color: #0288D1;
-        }
-        .card-table {
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            border-radius: 10px;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .bg-yellow-brand { background-color: #FACC15; }
+        .text-yellow-brand { color: #FACC15; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen">
 
-<body>
-<nav class="navbar navbar-light bg-light shadow-sm sticky-top">
-    <div class="container-fluid">
-        <a class="navbar-brand fw-bold">Electro Payment <i class="fa-solid fa-bolt"></i></a>
-        <div class="d-flex">
-            <a href="index.php" class="btn btn-primary me-2 d-flex align-items-center">
-                Admin <i class="fa-solid fa-user-tie ms-2"></i>
-            </a>
-            <a href="logout.php" class="btn btn-secondary d-flex align-items-center">
-                Keluar <i class="fa-solid fa-right-from-bracket ms-2"></i>
-            </a>
+    <nav class="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <span class="text-yellow-brand text-2xl"><i class="fa-solid fa-bolt"></i></span>
+                    <span class="font-bold text-xl tracking-tight uppercase">ELECTRO<span class="text-yellow-brand">PAY</span></span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center bg-zinc-800 px-3 py-1.5 rounded-lg border border-zinc-700 mr-2">
+                        <span class="text-xs font-bold text-yellow-brand mr-2">ADMIN</span>
+                        <span class="text-sm text-zinc-300"><?php echo $_SESSION['user']; ?></span>
+                    </div>
+                    <a href="logout.php" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-right-from-bracket"></i> <span class="hidden md:inline">Keluar</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="bg-zinc-900/50 border-y border-zinc-800 sticky top-16 z-40 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4">
+            <ul class="flex overflow-x-auto py-3 gap-8 no-scrollbar">
+                <li>
+                    <a href="index.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
+                        <i class="fa-solid fa-chart-line"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="data_pelanggan.php" class="text-yellow-brand font-bold flex items-center gap-2 whitespace-nowrap border-b-2 border-yellow-brand pb-1">
+                        <i class="fa-solid fa-users-gear"></i> Data Pelanggan
+                    </a>
+                </li>
+                <li>
+                    <a href="data_pembayaran.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
+                        <i class="fa-solid fa-money-bill-transfer"></i> Transaksi
+                    </a>
+                </li>
+                <li>
+                    <a href="data_tarif.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
+                        <i class="fa-solid fa-bolt-lightning"></i> Atur Tarif
+                    </a>
+                </li>
+                <li>
+                    <a href="data_penggunaan.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
+                        <i class="fa-solid fa-gauge-high"></i> Penggunaan
+                    </a>
+                </li>
+                <li>
+                    <a href="data_tagihan.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> Tagihan
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
-</nav>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light mt-3 shadow-sm">
-    <div class="container-fluid">
-        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.php"><i class="fa-solid fa-house-user me-1"></i> Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_pelanggan.php"><i class="fa-solid fa-tachograph-digital me-1"></i> Data Pelanggan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_pembayaran.php"><i class="fa-solid fa-tag me-1"></i> Data Pembayaran</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_tarif.php"><i class="fa-solid fa-rupiah-sign me-1"></i> Data Tarif</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_penggunaan.php"><i class="fa-solid fa-database me-1"></i> Data Penggunaan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_tagihan.php"><i class="fa-solid fa-server me-1"></i> Data Tagihan</a>
-                    </li>
-                </ul>
+    <main class="max-w-3xl mx-auto px-4 py-12">
+        <div class="mb-8 flex items-center gap-4">
+            <a href="data_pelanggan.php" class="w-10 h-10 bg-zinc-900 border border-zinc-800 flex items-center justify-center rounded-xl text-zinc-400 hover:text-yellow-brand hover:border-yellow-brand transition-all">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div>
+                <h2 class="text-2xl font-bold">Perbarui Data Pelanggan</h2>
+                <p class="text-zinc-500 text-sm">Mengubah informasi untuk: <span class="text-yellow-brand font-bold"><?php echo $data['nama']; ?></span></p>
             </div>
-    </div>
-</nav>
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-6">
+        </div>
 
-            <div class="card p-4">
-                <h3 class="text-center mb-3">Edit Data Pelanggan</h3>
+        <div class="bg-zinc-900 rounded-3xl border border-zinc-800 shadow-xl p-8">
+            <form action="update_pelanggan.php" method="post" class="space-y-6">
+                
+                <input type="hidden" name="id" value="<?= $data['id'] ?>">
 
-                <form action="update_pelanggan.php" method="post">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase tracking-widest text-zinc-500">ID Pelanggan</label>
+                        <input type="text" name="id_pelanggan" value="<?= $data['id_pelanggan'] ?>" class="w-full bg-zinc-800 border border-zinc-700 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-yellow-brand/50 focus:border-yellow-brand outline-none transition-all" required>
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-xs font-bold uppercase tracking-widest text-zinc-500">Nomor Meter</label>
+                        <input type="number" name="nometer" value="<?= $data['nometer'] ?>" class="w-full bg-zinc-800 border border-zinc-700 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-yellow-brand/50 focus:border-yellow-brand outline-none transition-all" required>
+                    </div>
+                </div>
 
-                    <input type="hidden" name="id" value="<?= $data['id'] ?>"> <!-- FIX -->
+                <div>
+                    <label class="block mb-2 text-xs font-bold uppercase tracking-widest text-zinc-500">Nama Lengkap</label>
+                    <input type="text" name="nama" value="<?= $data['nama'] ?>" class="w-full bg-zinc-800 border border-zinc-700 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-yellow-brand/50 focus:border-yellow-brand outline-none transition-all" required>
+                </div>
 
-                    <label class="form-label">ID Pelanggan</label>
-                    <input type="text" class="form-control" name="id_pelanggan" value="<?= $data['id_pelanggan'] ?>" required>
+                <div>
+                    <label class="block mb-2 text-xs font-bold uppercase tracking-widest text-zinc-500">Alamat Lengkap</label>
+                    <textarea name="alamat" rows="3" class="w-full bg-zinc-800 border border-zinc-700 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-yellow-brand/50 focus:border-yellow-brand outline-none transition-all"><?= $data['alamat'] ?></textarea>
+                </div>
 
-                    <label class="form-label mt-3">Nometer</label>
-                    <input type="number" class="form-control" name="nometer" value="<?= $data['nometer'] ?>" required>
-
-                    <label class="form-label mt-3">Nama</label>
-                    <input type="text" class="form-control" name="nama" value="<?= $data['nama'] ?>" required>
-
-                    <label class="form-label mt-3">Alamat</label>
-                    <input type="text" class="form-control" name="alamat" value="<?= $data['alamat'] ?>">
-
-                    <label class="form-label mt-3">Kode Tarif</label>
-                    <select name="kodetarif" class="form-select" required>
-                        <option value="">-- Pilih Kode Tarif --</option>
-
+                <div>
+                    <label class="block mb-2 text-xs font-bold uppercase tracking-widest text-zinc-500">Golongan Tarif</label>
+                    <select name="kodetarif" class="w-full bg-zinc-800 border border-zinc-700 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-yellow-brand/50 focus:border-yellow-brand outline-none transition-all cursor-pointer" required>
                         <?php while ($row = mysqli_fetch_assoc($tarif)) { ?>
-                            <option value="<?= $row['kodetarif'] ?>" 
-                                <?= ($row['kodetarif'] == $data['kodetarif']) ? 'selected' : '' ?>>
-                                <?= $row['kodetarif'] ?> - <?= $row['daya'] ?> VA
+                            <option value="<?= $row['kodetarif'] ?>" class="bg-zinc-900" <?= ($row['kodetarif'] == $data['kodetarif']) ? 'selected' : '' ?>>
+                                <?= $row['kodetarif'] ?> — (<?= number_format($row['daya'], 0, ',', '.') ?> VA)
                             </option>
                         <?php } ?>
                     </select>
+                </div>
 
-                    <button type="submit" class="btn btn-success w-100 mt-4">Update</button>
+                <div class="pt-4 flex flex-col gap-3">
+                    <button type="submit" class="w-full bg-yellow-brand hover:bg-yellow-500 text-zinc-950 font-black py-4 rounded-xl shadow-lg shadow-yellow-900/10 flex items-center justify-center gap-2 transition-all active:scale-95 uppercase tracking-widest">
+                        <i class="fa-solid fa-rotate"></i> PERBARUI DATA
+                    </button>
+                    <a href="data_pelanggan.php" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all text-sm uppercase tracking-widest">
+                        Batalkan Perubahan
+                    </a>
+                </div>
 
-                </form>
-
-                <a href="data_pelanggan.php" class="btn btn-secondary w-100 mt-3">Kembali</a>
-            </div>
-
+            </form>
         </div>
-    </div>
-</div>
+    </main>
 
+    <footer class="text-center py-10 border-t border-zinc-900">
+        <p class="text-zinc-600 text-xs uppercase tracking-widest font-bold">
+            &copy; <?php echo date('Y'); ?> Electro Payment System - Security Enforced
+        </p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 </body>
 </html>

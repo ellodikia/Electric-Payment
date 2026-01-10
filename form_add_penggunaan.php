@@ -1,7 +1,13 @@
 <?php
+session_start();
+if (!isset($_SESSION['user'])) {
+    header("Location: login.php");
+    exit();
+}
 include 'koneksi.php';
 
-$id_pelanggan = mysqli_query($koneksi, "SELECT id_pelanggan FROM payment_pelanggan");
+// Ambil data pelanggan untuk dropdown
+$id_pelanggan_query = mysqli_query($koneksi, "SELECT id_pelanggan, nama FROM payment_pelanggan ORDER BY id_pelanggan ASC");
 ?>
 
 <!DOCTYPE html>
@@ -9,130 +15,195 @@ $id_pelanggan = mysqli_query($koneksi, "SELECT id_pelanggan FROM payment_pelangg
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="image/logo.png" type="" />
-    <title>Tambah Data Pelanggan | Electro Payment</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="js/bootstrap.bundle.min.js"></script>
+    <link rel="icon" href="image/logo.png" type="image/png" />
+    <title>Input Penggunaan | Electro Payment</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
     <style>
-        .navbar-light .navbar-nav .nav-link {
-            color: rgba(0,0,0,.9);
-            font-weight: 500;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .bg-yellow-brand { background-color: #FACC15; }
+        .text-yellow-brand { color: #FACC15; }
+        
+        .form-input-custom {
+            background-color: #18181b;
+            border: 1px solid #27272a;
+            color: #f4f4f5;
+            transition: all 0.3s ease;
         }
-        .card {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .form-input-custom:focus {
+            border-color: #FACC15;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.1);
+        }
+        select option {
+            background-color: #18181b;
+            color: #f4f4f5;
         }
     </style>
 </head>
 
-<body>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen">
 
-<nav class="navbar navbar-light bg-light shadow-sm sticky-top">
-    <div class="container-fluid">
-        <a class="navbar-brand fw-bold">Electro Payment <i class="fa-solid fa-bolt"></i></a>
-        <div class="d-flex">
-            <a href="index.php" class="btn btn-primary me-2 d-flex align-items-center">
-                Admin <i class="fa-solid fa-user-tie ms-2"></i>
-            </a>
-            <a href="logout.php" class="btn btn-secondary d-flex align-items-center">
-                Keluar <i class="fa-solid fa-right-from-bracket ms-2"></i>
-            </a>
+    <nav class="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <span class="text-yellow-brand text-2xl"><i class="fa-solid fa-bolt"></i></span>
+                    <span class="font-bold text-xl tracking-tight uppercase">ELECTRO<span class="text-yellow-brand">PAY</span></span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center bg-zinc-800 px-3 py-1.5 rounded-lg border border-zinc-700 mr-2">
+                        <span class="text-xs font-bold text-yellow-brand mr-2">ADMIN</span>
+                        <span class="text-sm text-zinc-300"><?php echo $_SESSION['user']; ?></span>
+                    </div>
+                    <a href="logout.php" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-right-from-bracket"></i> <span class="hidden md:inline">Keluar</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="bg-zinc-900/50 border-y border-zinc-800 sticky top-16 z-40 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4">
+            <ul class="flex overflow-x-auto py-3 gap-8 no-scrollbar">
+                <li>
+                    <a href="index.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
+                        <i class="fa-solid fa-chart-line"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="data_pelanggan.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
+                        <i class="fa-solid fa-users-gear"></i> Data Pelanggan
+                    </a>
+                </li>
+                <li>
+                    <a href="data_pembayaran.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
+                        <i class="fa-solid fa-money-bill-transfer"></i> Transaksi
+                    </a>
+                </li>
+                <li>
+                    <a href="data_tarif.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
+                        <i class="fa-solid fa-bolt-lightning"></i> Atur Tarif
+                    </a>
+                </li>
+                <li>
+                    <a href="data_penggunaan.php" class="text-yellow-brand font-bold flex items-center gap-2 whitespace-nowrap border-b-2 border-yellow-brand pb-1">
+                        <i class="fa-solid fa-gauge-high"></i> Penggunaan
+                    </a>
+                </li>
+                <li>
+                    <a href="data_tagihan.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> Tagihan
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
-</nav>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light mt-3 shadow-sm">
-    <div class="container-fluid">
-        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.php"><i class="fa-solid fa-house-user me-1"></i> Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_pelanggan.php"><i class="fa-solid fa-tachograph-digital me-1"></i> Data Pelanggan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_pembayaran.php"><i class="fa-solid fa-tag me-1"></i> Data Pembayaran</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_tarif.php"><i class="fa-solid fa-rupiah-sign me-1"></i> Data Tarif</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_penggunaan.php"><i class="fa-solid fa-database me-1"></i> Data Penggunaan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data_tagihan.php"><i class="fa-solid fa-server me-1"></i> Data Tagihan</a>
-                    </li>
-                </ul>
+    <main class="max-w-7xl mx-auto px-4 py-12">
+        <div class="flex flex-col items-center">
+            
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-yellow-brand/10 text-yellow-brand rounded-2xl mb-4">
+                    <i class="fa-solid fa-gauge-high text-2xl"></i>
+                </div>
+                <h2 class="text-3xl font-black tracking-tight uppercase">Pencatatan <span class="text-yellow-brand">Meter</span></h2>
+                <p class="text-zinc-500 mt-2 text-sm uppercase tracking-widest font-bold">Input penggunaan listrik bulanan pelanggan</p>
             </div>
-    </div>
-</nav>
 
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-6">
+            <div class="w-full max-w-xl bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-2xl">
+                <form action="insert_penggunaan_tagihan.php" method="post" class="space-y-6">
+                    
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Pilih Pelanggan</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-zinc-600">
+                                <i class="fa-solid fa-user-gear"></i>
+                            </span>
+                            <select name="id_pelanggan" class="form-input-custom w-full pl-10 pr-4 py-3 rounded-xl text-sm font-bold appearance-none cursor-pointer" required>
+                                <option value="">-- Pilih ID Pelanggan --</option>
+                                <?php while ($row = mysqli_fetch_assoc($id_pelanggan_query)) { ?>
+                                    <option value="<?= $row['id_pelanggan'] ?>">
+                                        <?= $row['id_pelanggan'] ?> - <?= $row['nama'] ?>
+                                    </option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
 
-            <div class="card p-4">
-                <h3 class="mb-3 text-center">Tambah Data Penggunaan</h3>
-                
-                <form action="insert_penggunaan_tagihan.php" method="post">
-                    
-                    <label class="form-label mt-3">ID Pelanggan</label>
-                    <select name="id_pelanggan" class="form-select" required>
-                        <option value="">-- Pilih ID Pelanggan --</option>
-                        <?php while ($row = mysqli_fetch_assoc($id_pelanggan)) { ?>
-                            <option value="<?= $row['id_pelanggan'] ?>">
-                                <?= $row['id_pelanggan'] ?> 
-                            </option>
-                        <?php } ?>
-                    </select>
-                    <br>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Bulan</label>
+                            <select name="bulan" class="form-input-custom w-full px-4 py-3 rounded-xl text-sm font-bold appearance-none cursor-pointer" required>
+                                <option value="" disabled selected>Pilih Bulan</option>
+                                <?php 
+                                $bulan_list = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                                foreach ($bulan_list as $bln) {
+                                    echo "<option value='$bln'>$bln</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Tahun</label>
+                            <input type="number" name="tahun" value="<?= date('Y') ?>" placeholder="2024" required
+                                class="form-input-custom w-full px-4 py-3 rounded-xl text-sm font-bold">
+                        </div>
+                    </div>
 
-                    <label class="form-label">Bulan</label>
-                    <select name="bulan" class="form-select" required><
-                    <option value="" disabled selected>Bulan</option>
-                    <option value="Januari">Januari</option>
-                    <option value="Februari">Februari</option>
-                    <option value="Maret">Maret</option>
-                    <option value="April">April</option>
-                    <option value="Mei">Mei</option>
-                    <option value="Juni">Juni</option>
-                    <option value="July">July</option>
-                    <option value="Agustus">Agustus</option>
-                    <option value="September">September</option>
-                    <option value="Oktober">Oktober</option>
-                    <option value="November">November</option>
-                    <option value="Desember">Desember</option>
-                    </select>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Meter Awal (kWh)</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-zinc-600">
+                                    <i class="fa-solid fa-circle-arrow-right"></i>
+                                </span>
+                                <input type="number" name="meterawal" placeholder="0" required
+                                    class="form-input-custom w-full pl-10 pr-4 py-3 rounded-xl text-sm font-bold">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Meter Akhir (kWh)</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-zinc-600">
+                                    <i class="fa-solid fa-circle-arrow-left"></i>
+                                </span>
+                                <input type="number" name="meterakhir" placeholder="0" required
+                                    class="form-input-custom w-full pl-10 pr-4 py-3 rounded-xl text-sm font-bold text-yellow-brand">
+                            </div>
+                        </div>
+                    </div>
 
-                    <label class="form-label mt-3">Tahun</label>
-                    <input type="number" class="form-control" name="tahun" required>
+                    <div class="pt-6">
+                        <button type="submit" class="w-full bg-yellow-brand hover:bg-yellow-400 text-zinc-950 font-black py-4 rounded-xl transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs active:scale-[0.98] shadow-lg shadow-yellow-900/20">
+                            <i class="fa-solid fa-file-invoice-dollar"></i> Simpan & Generate Tagihan
+                        </button>
+                    </div>
 
-                    <label class="form-label mt-3">Meter Awal</label>
-                    <input type="number" class="form-control" name="meterawal" required>
-                    
-                    <label class="form-label mt-3">Meter Akhir</label>
-                    <input type="number" class="form-control" name="meterakhir">
-                    
-                    
-                    <button type="submit" class="btn btn-success w-100 mt-4">Simpan</button>
-                    
                 </form>
 
-                <a href="data_penggunaan.php" class="btn btn-outline-secondary w-100 mt-3">
-                    Kembali
-                </a>
+                <div class="mt-8 text-center border-t border-zinc-800 pt-6">
+                    <a href="data_penggunaan.php" class="text-zinc-600 hover:text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em] transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard
+                    </a>
+                </div>
+            </div>
 
+            <div class="mt-8 max-w-md bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-4 flex gap-4 items-center">
+                <div class="w-10 h-10 bg-zinc-800 text-zinc-400 rounded-full flex items-center justify-center flex-shrink-0 border border-zinc-700">
+                    <i class="fa-solid fa-circle-info"></i>
+                </div>
+                <p class="text-zinc-500 text-[10px] leading-relaxed font-medium uppercase tracking-wider">
+                    Pastikan <span class="text-zinc-300">Meter Akhir</span> lebih besar dari <span class="text-zinc-300">Meter Awal</span>. Sistem akan otomatis menghitung tagihan berdasarkan tarif pelanggan.
+                </p>
             </div>
 
         </div>
-    </div>
-</div>
-
+    </main>
 
 </body>
 </html>

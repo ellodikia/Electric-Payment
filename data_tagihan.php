@@ -1,6 +1,13 @@
 <?php
 include 'koneksi.php';
+session_start(); 
 
+if (!isset($_SESSION['user'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Logika Pembayaran
 if (isset($_GET['bayar_id'])) {
     $id_tagihan = mysqli_real_escape_string($koneksi, $_GET['bayar_id']);
     
@@ -21,103 +28,180 @@ if (isset($_GET['bayar_id'])) {
 
         if (mysqli_query($koneksi, $sql_riwayat) && mysqli_query($koneksi, $sql_update_status)) {
             $_SESSION['cetak_id'] = $id_byr;
-            
-            echo "<script>
-                    alert('Pembayaran Berhasil!');
-                    window.location='index.php?page=tagihan'; 
-                  </script>";
+            echo "<script>alert('Pembayaran Berhasil!'); window.location='data_tagihan.php';</script>";
             exit;
         }
     }
 }
 
-$query = mysqli_query($koneksi, "SELECT t.*, p.id_bayar 
-                                 FROM payment_tagihan t 
-                                 LEFT JOIN payment_pembayaran p ON t.id_pelanggan = p.id_pelanggan AND t.bulan = p.bulanbayar
-                                 ORDER BY t.id DESC");
+$query = mysqli_query($koneksi, "SELECT * FROM payment_tagihan ORDER BY id DESC");
 ?>
 
-<?php if (isset($_SESSION['cetak_id'])) : ?>
-<script>
-    window.open('cetak_struk.php?id=<?= $_SESSION['cetak_id']; ?>', '_blank');
-</script>
-<?php 
-    unset($_SESSION['cetak_id']);
-endif; 
-?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="image/logo.png" type="image/png" />
+    <title>Data Tagihan | Electro Payment</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-<div class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 animate-fadeIn">
-    <div>
-        <h2 class="text-3xl md:text-5xl font-black uppercase italic tracking-tighter text-white">
-            Billing <span class="text-yellow-400">& Tagihan</span>
-        </h2>
-        <p class="text-gray-400 mt-2 font-medium text-sm">Kelola penagihan pelanggan dan proses pembayaran instan.</p>
-    </div>
-    <div class="flex gap-3 w-full md:w-auto">
-        <div class="relative group w-full md:w-64">
-            <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-            <input type="text" placeholder="Cari ID Pelanggan..." class="w-full bg-[#1e1e1e] border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-xs font-bold text-white focus:outline-none focus:border-yellow-400 transition">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .bg-yellow-brand { background-color: #FACC15; }
+        .text-yellow-brand { color: #FACC15; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+
+<body class="bg-zinc-950 text-zinc-100 min-h-screen">
+
+    <?php if (isset($_SESSION['cetak_id'])) : ?>
+    <script>
+        window.open('cetak_struk.php?id=<?= $_SESSION['cetak_id']; ?>', '_blank');
+    </script>
+    <?php unset($_SESSION['cetak_id']); endif; ?>
+
+    <nav class="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <span class="text-yellow-brand text-2xl"><i class="fa-solid fa-bolt"></i></span>
+                    <span class="font-bold text-xl tracking-tight uppercase">ELECTRO<span class="text-yellow-brand">PAY</span></span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center bg-zinc-800 px-3 py-1.5 rounded-lg border border-zinc-700 mr-2">
+                        <span class="text-xs font-bold text-yellow-brand mr-2">ADMIN</span>
+                        <span class="text-sm text-zinc-300"><?php echo $_SESSION['user']; ?></span>
+                    </div>
+                    <a href="logout.php" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-right-from-bracket"></i> <span class="hidden md:inline">Keluar</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="bg-zinc-900/50 border-y border-zinc-800 sticky top-16 z-40 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4">
+            <ul class="flex overflow-x-auto py-3 gap-8 no-scrollbar">
+                <li>
+                    <a href="index.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
+                        <i class="fa-solid fa-chart-line"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="data_pelanggan.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
+                        <i class="fa-solid fa-users-gear"></i> Data Pelanggan
+                    </a>
+                </li>
+                <li>
+                    <a href="data_pembayaran.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
+                        <i class="fa-solid fa-money-bill-transfer"></i> Transaksi
+                    </a>
+                </li>
+                <li>
+                    <a href="data_tarif.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
+                        <i class="fa-solid fa-bolt-lightning"></i> Atur Tarif
+                    </a>
+                </li>
+                <li>
+                    <a href="data_penggunaan.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
+                        <i class="fa-solid fa-gauge-high"></i> Penggunaan
+                    </a>
+                </li>
+                <li>
+                    <a href="data_tagihan.php" class="text-yellow-brand font-bold flex items-center gap-2 whitespace-nowrap border-b-2 border-yellow-brand pb-1">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> Tagihan
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
-</div>
 
-<div class="bg-[#1e1e1e] rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl relative">
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-[#252525] border-b border-white/5">
-                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em] text-center w-16">No</th>
-                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em]">Pelanggan</th>
-                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em] text-center">Periode</th>
-                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em] text-center">Konsumsi</th>
-                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em]">Total Tagihan</th>
-                    <th class="px-6 py-6 text-[10px] font-black text-yellow-400 uppercase tracking-[0.2em] text-center">Status / Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-white/5">
-                <?php
-                $no = 1;
-                while ($row = mysqli_fetch_array($query)) {
-                ?>
-                <tr class="hover:bg-white/[0.02] transition-colors group">
-                    <td class="px-6 py-6 text-sm font-black text-gray-600 text-center"><?= $no++; ?></td>
-                    <td class="px-6 py-6">
-                        <span class="bg-[#121212] px-3 py-1.5 rounded-lg border border-white/5 font-mono text-xs font-bold text-yellow-400 tracking-wider">
-                            <?= $row['id_pelanggan']; ?>
-                        </span>
-                    </td>
-                    <td class="px-6 py-6 text-center text-xs font-bold text-white uppercase italic">
-                        <?= $row['bulan']; ?> <span class="text-gray-500 not-italic"><?= $row['tahun']; ?></span>
-                    </td>
-                    <td class="px-6 py-6 text-center">
-                        <span class="text-white font-black"><?= $row['jumlahmeter']; ?></span>
-                        <span class="text-[10px] text-gray-500 font-bold ml-1">kWh</span>
-                    </td>
-                    <td class="px-6 py-6">
-                        <span class="text-yellow-400 font-black italic text-sm">Rp <?= number_format($row['jumlahtagihan'], 0, ',', '.'); ?></span>
-                    </td>
-                    <td class="px-6 py-6 text-center">
-                        <?php if ($row['status'] == 1) : ?>
-                            <div class="flex items-center justify-center gap-2">
-                                <div class="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 text-green-500 rounded-xl border border-green-500/20 shadow-lg shadow-green-500/5">
-                                    <i class="fa-solid fa-circle-check text-[10px]"></i>
-                                    <span class="text-[10px] font-black uppercase tracking-widest">PAID</span>
+    <main class="max-w-7xl mx-auto px-4 py-10">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div>
+                <h2 class="text-3xl font-black">Data Tagihan</h2>
+                <p class="text-zinc-500 text-xs uppercase tracking-[0.2em] mt-1">Management & Billing System</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="#" class="bg-zinc-800 hover:bg-zinc-700 text-white px-5 py-3 rounded-xl font-bold text-xs flex items-center gap-2 border border-zinc-700 transition-all">
+                    <i class="fa-solid fa-magnifying-glass"></i> CARI TAGIHAN
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-zinc-900 rounded-3xl border border-zinc-800 shadow-2xl overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-zinc-800/50 text-zinc-500 text-[10px] uppercase tracking-[0.2em] border-b border-zinc-800">
+                            <th class="px-6 py-5 text-center">No</th>
+                            <th class="px-6 py-5">Identitas Pelanggan</th>
+                            <th class="px-6 py-5">Periode</th>
+                            <th class="px-6 py-5">Volume Penggunaan</th>
+                            <th class="px-6 py-5">Total Billing</th>
+                            <th class="px-6 py-5 text-center">Status / Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-800">
+                        <?php
+                            $no = 1;
+                            while ($row = mysqli_fetch_array($query)) {
+                                $status = $row['status'];
+                        ?>
+                        <tr class="hover:bg-zinc-800/30 transition-all group">
+                            <td class="px-6 py-5 text-center text-zinc-600 font-mono text-sm"><?= $no++; ?></td>
+                            <td class="px-6 py-5">
+                                <div class="flex flex-col">
+                                    <span class="text-zinc-400 text-[10px] font-bold uppercase tracking-tighter">Account ID</span>
+                                    <span class="text-yellow-brand font-mono font-bold tracking-wider"><?= $row['id_pelanggan']; ?></span>
                                 </div>
-                                <a href="cetak_struk.php?id=<?= $row['id_bayar']; ?>" target="_blank" class="w-10 h-10 flex items-center justify-center bg-[#121212] hover:bg-white text-gray-500 hover:text-black rounded-xl transition-all border border-white/5 shadow-lg">
-                                    <i class="fa-solid fa-print text-xs"></i>
-                                </a>
-                            </div>
-                        <?php else : ?>
-                            <a href="index.php?page=tagihan&bayar_id=<?= $row['id']; ?>" 
-                               onclick="return confirm('Konfirmasi pembayaran untuk ID <?= $row['id_pelanggan']; ?>?')"
-                               class="inline-flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-xl font-black text-[10px] transition transform hover:scale-105 uppercase tracking-widest shadow-lg shadow-yellow-400/20">
-                                <i class="fa-solid fa-money-bill-wave"></i> Bayar Sekarang
-                            </a>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-                <?php } ?>
-            </tbody>
-        </table>
-    </div>
-</div>
+                            </td>
+                            <td class="px-6 py-5">
+                                <span class="bg-zinc-800 text-zinc-300 px-3 py-1 rounded-lg text-xs font-bold">
+                                    <?= $row['bulan'] ?> / <?= $row['tahun'] ?>
+                                </span>
+                            </td>
+                            <td class="px-6 py-5">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-zinc-200 font-bold"><?= $row['jumlahmeter']; ?></span>
+                                    <span class="text-zinc-600 text-[10px] font-black uppercase">kWh</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-5">
+                                <span class="text-emerald-400 font-mono font-bold">Rp <?= number_format($row['jumlahtagihan'], 0, ',', '.'); ?></span>
+                            </td>
+                            <td class="px-6 py-5 text-center">
+                                <?php if ($status == 1) : ?>
+                                    <span class="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase inline-flex items-center gap-2">
+                                        <i class="fa-solid fa-check-double"></i> Paid / Lunas
+                                    </span>
+                                <?php else : ?>
+                                    <a href="?bayar_id=<?= $row['id']; ?>" 
+                                       class="bg-yellow-brand hover:bg-yellow-400 text-zinc-950 px-4 py-2 rounded-xl text-[10px] font-black uppercase flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-yellow-900/10"
+                                       onclick="return confirm('Proses pembayaran tagihan ini?')">
+                                        <i class="fa-solid fa-cash-register text-xs"></i> Bayar Sekarang
+                                    </a>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-10 border-t border-zinc-900">
+        <p class="text-zinc-700 text-[10px] font-black uppercase tracking-[0.5em]">
+            &copy; <?= date('Y'); ?> Electro Payment System &bull; Billing Core V2
+        </p>
+    </footer>
+
+</body>
+</html>

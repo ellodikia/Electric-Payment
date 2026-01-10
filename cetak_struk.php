@@ -1,6 +1,6 @@
 <?php
 include 'koneksi.php';
-require('fpdf.php');
+require('fpdf.php'); 
 
 function terbilang($x) {
     $angka = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"];
@@ -15,60 +15,64 @@ function terbilang($x) {
 }
 
 $idb = mysqli_real_escape_string($koneksi, $_GET['id'] ?? '');
+if (empty($idb)) die("ID Pembayaran tidak ditemukan.");
 
-if (empty($idb)) {
-    die("ID Pembayaran tidak ditemukan.");
-}
+$query_pembayaran = mysqli_query($koneksi, "SELECT * FROM payment_pembayaran WHERE id_bayar='$idb'");
+$row = mysqli_fetch_assoc($query_pembayaran);
 
-$query = mysqli_query($koneksi, "SELECT p.*, pl.nama, pl.alamat, pl.nometer, t.daya, t.tarifperkwh, tg.jumlahmeter 
-    FROM payment_pembayaran p 
-    JOIN payment_pelanggan pl ON p.id_pelanggan = pl.id_pelanggan 
-    JOIN payment_tarif t ON pl.kodetarif = t.kodetarif 
-    JOIN payment_tagihan tg ON p.id_pelanggan = tg.id_pelanggan AND p.bulanbayar = tg.bulan
-    WHERE p.id_bayar = '$idb' LIMIT 1");
+if (!$row) die("Data transaksi tidak valid.");
 
-$row = mysqli_fetch_assoc($query);
+$id_pel = $row['id_pelanggan'];
+$bulan  = $row['bulanbayar'];
 
-if (!$row) {
-    die("Data pembayaran tidak ditemukan di database.");
-}
+$query_pelanggan = mysqli_query($koneksi, "SELECT * FROM payment_pelanggan WHERE id_pelanggan='$id_pel'");
+$c = mysqli_fetch_assoc($query_pelanggan);
 
-$pdf = new FPDF('P', 'mm', array(210, 297));
+$query_penggunaan = mysqli_query($koneksi, "SELECT * FROM payment_penggunaan WHERE id_pelanggan='$id_pel' AND bulan='$bulan'");
+$e = mysqli_fetch_assoc($query_penggunaan);
+
+$nama    = strtoupper($c['nama'] ?? 'PELANGGAN');
+$alamat  = $c['alamat'] ?? '-';
+$tarif   = $c['id_tarif'] ?? '-';
+$mawal   = $e['meter_awal'] ?? '0';
+$makhir  = $e['meter_akhir'] ?? '0';
+$total   = (float)$row['total'];
+$admin   = (float)$row['biayaadmin'];
+$jumlah  = $total - $admin;
+
+$pdf = new FPDF('L','mm',array(210, 148));
 $pdf->AddPage();
-$pdf->SetFont('Courier', 'B', 14);
+$pdf->SetFont('Courier','B',14);
 
-$pdf->Cell(0, 7, 'ELECTRO PAYMENT', 0, 1, 'C');
-$pdf->SetFont('Courier', '', 10);
-$pdf->Cell(0, 5, str_repeat('=', 65), 0, 1, 'C');
-$pdf->Cell(0, 5, 'STRUK PEMBAYARAN TAGIHAN LISTRIK', 0, 1, 'C');
+$pdf->Cell(0,7,'ELEKTRO PAYMENT',0,1,'C');
+$pdf->SetFont('Courier','',10);
+$pdf->Cell(0,5,str_repeat('=', 65),0,1,'C');
+$pdf->Cell(0,5,'STRUK PEMBAYARAN TAGIHAN LISTRIK',0,1,'C');
 $pdf->Ln(4);
 
-$pdf->Cell(45, 6, 'TANGGAL BAYAR  :', 0, 0); $pdf->Cell(60, 6, date('d/m/Y', strtotime($row['tanggal'])), 0, 0);
-$pdf->Cell(25, 6, 'BANK     :', 0, 0); $pdf->Cell(0, 6, 'BANK BNI', 0, 1);
+$pdf->Cell(45,6,'TANGGAL BAYAR  :',0,0); $pdf->Cell(60,6, date('d/m/Y', strtotime($row['tanggal'])),0,0);
+$pdf->Cell(25,6,'BANK     :',0,0); $pdf->Cell(0,6,'BANK BNI',0,1);
 
-$pdf->Cell(45, 6, 'ID TRANSAKSI   :', 0, 0); $pdf->Cell(0, 6, $row['id_bayar'], 0, 1);
-$pdf->Cell(45, 6, 'ID PELANGGAN   :', 0, 0); $pdf->Cell(0, 6, $row['id_pelanggan'], 0, 1);
-$pdf->Cell(45, 6, 'NAMA           :', 0, 0); $pdf->Cell(0, 6, strtoupper($row['nama']), 0, 1);
-$pdf->Cell(45, 6, 'ALAMAT         :', 0, 0); $pdf->Cell(0, 6, strtoupper($row['alamat']), 0, 1);
-$pdf->Cell(45, 6, 'TARIF/DAYA     :', 0, 0); $pdf->Cell(0, 6, $row['daya'] . ' VA', 0, 1);
-$pdf->Cell(45, 6, 'BULAN/TAHUN    :', 0, 0); $pdf->Cell(0, 6, strtoupper($row['bulanbayar']), 0, 1);
-$pdf->Cell(45, 6, 'STAND METER    :', 0, 0); $pdf->Cell(0, 6, $row['jumlahmeter'] . ' kWh', 0, 1);
+$pdf->Cell(45,6,'ID TRANSAKSI   :',0,0); $pdf->Cell(0,6, $idb,0,1);
+$pdf->Cell(45,6,'ID PELANGGAN   :',0,0); $pdf->Cell(0,6, $id_pel,0,1);
+$pdf->Cell(45,6,'NAMA           :',0,0); $pdf->Cell(0,6, $nama,0,1);
+$pdf->Cell(45,6,'ALAMAT         :',0,0); $pdf->Cell(0,6, $alamat,0,1);
+$pdf->Cell(45,6,'STAND METER    :',0,0); $pdf->Cell(0,6, $mawal . ' - ' . $makhir,0,1);
 
-$pdf->Cell(0, 5, str_repeat('-', 65), 0, 1, 'C');
+$pdf->Cell(0,2,str_repeat('-', 65),0,1,'C');
 
-$pdf->Cell(45, 6, 'RP TAG PLN     :', 0, 0); $pdf->Cell(0, 6, 'Rp ' . number_format($row['total'] - $row['biayaadmin'], 0, ',', '.'), 0, 1);
-$pdf->Cell(45, 6, 'ADMIN BANK     :', 0, 0); $pdf->Cell(0, 6, 'Rp ' . number_format($row['biayaadmin'], 0, ',', '.'), 0, 1);
-$pdf->SetFont('Courier', 'B', 10);
-$pdf->Cell(45, 6, 'TOTAL BAYAR    :', 0, 0); $pdf->Cell(0, 6, 'Rp ' . number_format($row['total'], 0, ',', '.'), 0, 1);
-$pdf->SetFont('Courier', 'I', 9);
-$pdf->Cell(45, 6, 'TERBILANG      :', 0, 0); $pdf->Cell(0, 6, strtoupper(terbilang($row['total'])) . ' RUPIAH', 0, 1);
+$pdf->Cell(45,6,'JUMLAH TAGIHAN :',0,0); $pdf->Cell(0,6,'Rp '.number_format($jumlah,0,',','.'),0,1);
+$pdf->Cell(45,6,'BIAYA ADMIN    :',0,0); $pdf->Cell(0,6,'Rp '.number_format($admin,0,',','.'),0,1);
+$pdf->SetFont('Courier','B',12);
+$pdf->Cell(45,8,'TOTAL BAYAR    :',0,0); $pdf->Cell(0,8,'Rp '.number_format($total,0,',','.'),0,1);
 
-$pdf->Ln(4);
-$pdf->SetFont('Courier', '', 9);
-$pdf->Cell(0, 5, str_repeat('=', 65), 0, 1, 'C');
-$pdf->Cell(0, 5, 'Listrik adalah energi untuk kehidupan yang lebih baik.', 0, 1, 'C');
-$pdf->Cell(0, 5, 'Terima Kasih.', 0, 1, 'C');
-$pdf->Cell(0, 5, str_repeat('=', 65), 0, 1, 'C');
+$pdf->SetFont('Courier','I',10);
+$pdf->Cell(45,6,'TERBILANG      :',0,0); 
+$pdf->MultiCell(0,6, strtoupper(terbilang($total))." RUPIAH",0,'L');
 
-$pdf->Output('I', 'Struk_' . $row['id_pelanggan'] . '.pdf');
+$pdf->Ln(5);
+$pdf->SetFont('Courier','',9);
+$pdf->Cell(0,5,'Simpan struk ini sebagai bukti pembayaran yang sah.',0,1,'C');
+
+$pdf->Output('I', 'Struk_'.$idb.'.pdf');
 ?>

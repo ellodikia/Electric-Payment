@@ -43,75 +43,98 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login | Electro Payment</title>
+    <link rel="icon" href="image/logo.png" type="image/png" />
+    <title>Login Administrator | Electro Payment</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
-        body { font-family: 'Outfit', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .bg-yellow-brand { background-color: #FACC15; }
+        .text-yellow-brand { color: #FACC15; }
+        .border-yellow-brand { border-color: #FACC15; }
     </style>
 </head>
-<body class="bg-[#121212] text-white min-h-screen flex items-center justify-center p-4">
+<body class="bg-zinc-950 min-h-screen flex items-center justify-center p-4">
 
-    <div class="max-w-4xl w-full grid md:grid-cols-2 bg-[#1e1e1e] rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5">
+    <div class="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800">
         
-        <div class="hidden md:flex flex-col justify-center items-center p-12 bg-yellow-400 relative overflow-hidden">
-            <i class="fa-solid fa-bolt-lightning absolute -top-10 -left-5 text-[15rem] text-black/5 rotate-12"></i>
-            <img src="image/5.png" alt="Login" class="w-64 h-64 object-contain relative z-10 grayscale brightness-50 contrast-150">
-            <div class="text-center mt-8 relative z-10">
-                <h2 class="text-3xl font-black text-black uppercase tracking-tighter italic">Electro Pay</h2>
-                <p class="text-black/60 font-bold text-sm uppercase tracking-widest">Administrator Access</p>
+        <div class="bg-yellow-brand p-8 flex flex-col justify-center items-center text-zinc-950">
+            <img src="image/5.png" alt="Ilustrasi Login" class="w-2/3 md:w-3/4 h-auto drop-shadow-xl mb-6">
+            <div class="text-center">
+                <h4 class="text-2xl font-bold uppercase tracking-tighter italic">Electro Payment System</h4>
+                <div class="h-1 w-12 bg-zinc-950 mx-auto my-2 rounded-full"></div>
+                <p class="text-sm font-medium opacity-80">Secure Administrator Access</p>
             </div>
         </div>
 
-        <div class="p-8 md:p-12 flex flex-col justify-center">
-            <div class="mb-10 text-center md:text-left">
-                <h3 class="text-3xl font-black uppercase tracking-tight italic">Welcome <span class="text-yellow-400">Back.</span></h3>
-                <p class="text-gray-500 font-medium">Silakan masuk ke akun administrator Anda.</p>
+        <div class="p-8 md:p-12 flex flex-col justify-center bg-zinc-900">
+            <div class="mb-8">
+                <h3 class="text-white text-3xl font-bold flex items-center gap-3">
+                    <span class="bg-yellow-brand text-zinc-900 p-2 rounded-lg">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </span>
+                    Login
+                </h3>
+                <p class="text-zinc-400 mt-2 text-sm">Silahkan masukkan kredensial admin Anda.</p>
             </div>
 
             <?php if ($error): ?>
-                <div class="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-500 text-sm font-bold">
+                <div class="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg text-sm mb-6 flex items-center gap-2">
                     <i class="fa-solid fa-circle-exclamation"></i>
                     <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
 
-            <form method="POST" class="space-y-6">
+            <form method="POST" class="space-y-5">
                 <div>
-                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 ml-2">Username</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-5 text-gray-600">
+                    <label for="username" class="block text-zinc-300 text-sm font-medium mb-2">Username</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-yellow-brand transition-colors">
                             <i class="fa-solid fa-user text-sm"></i>
-                        </span>
-                        <input type="text" name="user" required 
-                            class="w-full pl-12 pr-5 py-4 bg-[#121212] border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400 transition text-white font-bold"
-                            placeholder="Username" autocomplete="off">
+                        </div>
+                        <input type="text" 
+                               id="username" 
+                               name="user" 
+                               class="block w-full pl-10 pr-3 py-3 bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-brand/50 focus:border-yellow-brand transition-all placeholder-zinc-500" 
+                               placeholder="AdminID" 
+                               required 
+                               autocomplete="off">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 ml-2">Password</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-5 text-gray-600">
+                    <label for="password" class="block text-zinc-300 text-sm font-medium mb-2">Password</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-yellow-brand transition-colors">
                             <i class="fa-solid fa-lock text-sm"></i>
-                        </span>
-                        <input type="password" name="pass" required 
-                            class="w-full pl-12 pr-5 py-4 bg-[#121212] border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400 transition text-white font-bold"
-                            placeholder="••••••••">
+                        </div>
+                        <input type="password" 
+                               id="password" 
+                               name="pass" 
+                               class="block w-full pl-10 pr-3 py-3 bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-brand/50 focus:border-yellow-brand transition-all placeholder-zinc-500" 
+                               placeholder="••••••••" 
+                               required>
                     </div>
                 </div>
 
-                <button type="submit" 
-                    class="w-full py-4 bg-yellow-400 hover:bg-yellow-500 text-black rounded-2xl font-black uppercase tracking-widest transition transform hover:scale-[1.02] shadow-xl shadow-yellow-400/10">
-                    Sign In <i class="fa-solid fa-arrow-right-to-bracket ml-2"></i>
-                </button>
+                <div class="pt-2">
+                    <button type="submit" 
+                            class="w-full bg-yellow-brand hover:bg-yellow-500 text-zinc-950 font-bold py-3 px-4 rounded-xl shadow-lg shadow-yellow-900/10 transform transition-all active:scale-[0.98] flex items-center justify-center gap-2 group">
+                        <span>MASUK KE DASHBOARD</span>
+                        <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </div>
             </form>
 
-            <div class="mt-10 text-center">
-                <a href="beranda.php" class="text-xs font-black text-gray-600 hover:text-yellow-400 uppercase tracking-widest transition">
-                    <i class="fa-solid fa-chevron-left mr-2"></i> Kembali ke Beranda
-                </a>
+            <div class="mt-8 text-center">
+                <p class="text-zinc-500 text-xs">
+                    &copy; <?php echo date('Y'); ?> Electro Payment. All rights reserved.
+                </p>
             </div>
         </div>
     </div>
