@@ -6,6 +6,9 @@ include 'koneksi.php';
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
+    <meta name="keywords" content="electropay, electro-pay,aplikasi pembayaran listrik, cek tagihan listrik online, manajemen daya listrik, bayar listrik perkwh, sistem informasi pln, aplikasi admin listrik, pengelolaan data pelanggan listrik, tarif listrik terbaru, monitoring penggunaan listrik">
+    <meta name="description" content="ElectroPay - Solusi cerdas manajemen dan pembayaran daya listrik praktis, transparan, dan efisien.">
+    <meta name="author" content="ElectroPay, electro-pay">
     <link rel="icon" href="image/logo.png" type="image/png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ElectroPay</title>
