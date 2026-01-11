@@ -14,7 +14,7 @@ function terbilang($x) {
     return " nilai terlalu besar";
 }
 
-$idb = mysqli_real_escape_string($koneksi, $_GET['id'] ?? '');
+$idb = mysqli_real_escape_string($koneksi, $_GET['id_bayar'] ?? $_GET['id'] ?? '');
 if (empty($idb)) die("ID Pembayaran tidak ditemukan.");
 
 $query_pembayaran = mysqli_query($koneksi, "SELECT * FROM payment_pembayaran WHERE id_bayar='$idb'");

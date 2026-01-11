@@ -6,7 +6,6 @@ if (!isset($_SESSION['user'])) {
 }
 include 'koneksi.php';
 
-// Ambil data untuk referensi jika diperlukan
 $tarif = mysqli_query($koneksi, "SELECT kodetarif, daya FROM payment_tarif");
 ?>
 
@@ -27,7 +26,6 @@ $tarif = mysqli_query($koneksi, "SELECT kodetarif, daya FROM payment_tarif");
         .bg-yellow-brand { background-color: #FACC15; }
         .text-yellow-brand { color: #FACC15; }
         
-        /* Custom Input Styling */
         .form-input-custom {
             background-color: #18181b;
             border: 1px solid #27272a;
@@ -44,64 +42,8 @@ $tarif = mysqli_query($koneksi, "SELECT kodetarif, daya FROM payment_tarif");
 
 <body class="bg-zinc-950 text-zinc-100 min-h-screen">
 
-    <nav class="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center gap-2">
-                    <span class="text-yellow-brand text-2xl"><i class="fa-solid fa-bolt"></i></span>
-                    <span class="font-bold text-xl tracking-tight uppercase">ELECTRO<span class="text-yellow-brand">PAY</span></span>
-                </div>
-                <div class="flex items-center gap-3">
-                    <div class="hidden sm:flex items-center bg-zinc-800 px-3 py-1.5 rounded-lg border border-zinc-700 mr-2">
-                        <span class="text-xs font-bold text-yellow-brand mr-2">ADMIN</span>
-                        <span class="text-sm text-zinc-300"><?php echo $_SESSION['user']; ?></span>
-                    </div>
-                    <a href="logout.php" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2">
-                        <i class="fa-solid fa-right-from-bracket"></i> <span class="hidden md:inline">Keluar</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="bg-zinc-900/50 border-y border-zinc-800 sticky top-16 z-40 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4">
-            <ul class="flex overflow-x-auto py-3 gap-8 no-scrollbar">
-                <li>
-                    <a href="index.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
-                        <i class="fa-solid fa-chart-line"></i> Dashboard
-                    </a>
-                </li>
-                <li>
-                    <a href="data_pelanggan.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
-                        <i class="fa-solid fa-users-gear"></i> Data Pelanggan
-                    </a>
-                </li>
-                <li>
-                    <a href="data_pembayaran.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
-                        <i class="fa-solid fa-money-bill-transfer"></i> Transaksi
-                    </a>
-                </li>
-                <li>
-                    <a href="data_tarif.php" class="text-yellow-brand font-bold flex items-center gap-2 whitespace-nowrap border-b-2 border-yellow-brand pb-1">
-                        <i class="fa-solid fa-bolt-lightning"></i> Atur Tarif
-                    </a>
-                </li>
-                <li>
-                    <a href="data_penggunaan.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
-                        <i class="fa-solid fa-gauge-high"></i> Penggunaan
-                    </a>
-                </li>
-                <li>
-                    <a href="data_tagihan.php" class="text-zinc-400 hover:text-yellow-brand font-medium flex items-center gap-2 whitespace-nowrap transition-colors">
-                        <i class="fa-solid fa-file-invoice-dollar"></i> Tagihan
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <main class="max-w-7xl mx-auto px-4 py-12">
+<?php include 'nav.php'; ?>
+    <main class="max-w-7xl mx-auto px-4 py-12 pt-4">
         <div class="flex flex-col items-center">
             
             <div class="text-center mb-10">
@@ -169,6 +111,7 @@ $tarif = mysqli_query($koneksi, "SELECT kodetarif, daya FROM payment_tarif");
 
         </div>
     </main>
+<?php include 'footer.php'; ?>
 
 </body>
 </html>

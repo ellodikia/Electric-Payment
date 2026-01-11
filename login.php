@@ -5,7 +5,7 @@ include 'koneksi.php';
 $error = "";
 
 if (isset($_SESSION['user'])) {
-    header("Location: index.php");
+    header("Location: index2.php");
     exit();
 }
 
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             if ($pass === $row['pass']) {
                 $_SESSION['user'] = $row['user'];
-                header("Location: index.php");
+                header("Location: index2.php");
                 exit();
             } else {
                 $error = "Password salah!";
@@ -131,11 +131,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
             </form>
 
-            <div class="mt-8 text-center">
-                <p class="text-zinc-500 text-xs">
-                    &copy; <?php echo date('Y'); ?> Electro Payment. All rights reserved.
-                </p>
-            </div>
+           <?php include 'footer.php'; ?>
+
         </div>
     </div>
 
