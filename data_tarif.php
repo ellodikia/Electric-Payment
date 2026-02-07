@@ -100,15 +100,7 @@ $query = mysqli_query($koneksi, "SELECT * FROM payment_tarif ORDER BY id DESC") 
         </div>
         <?php endif; ?>
         
-        <div class="mt-8 p-6 bg-blue-500/5 border border-blue-500/10 rounded-2xl flex gap-4 items-center">
-            <div class="w-12 h-12 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center flex-shrink-0">
-                <i class="fa-solid fa-circle-info text-xl"></i>
-            </div>
-            <div>
-                <h4 class="text-blue-400 font-bold text-sm uppercase tracking-wider">Informasi Sistem</h4>
-                <p class="text-zinc-500 text-xs leading-relaxed">Perubahan tarif akan langsung berdampak pada perhitungan tagihan baru di periode penggunaan berikutnya. Pastikan kode tarif unik untuk setiap golongan daya.</p>
-            </div>
-        </div>
+        
     </main>
 
     <?php include 'footer.php'; ?>

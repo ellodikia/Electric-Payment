@@ -31,14 +31,14 @@ $c = mysqli_fetch_assoc($query_pelanggan);
 $query_penggunaan = mysqli_query($koneksi, "SELECT * FROM payment_penggunaan WHERE id_pelanggan='$id_pel' AND bulan='$bulan'");
 $e = mysqli_fetch_assoc($query_penggunaan);
 
+$admin   = 2500; 
+$tagihan_murni = (float)$row['total']; 
+$total   = $tagihan_murni + $admin;   
+
 $nama    = strtoupper($c['nama'] ?? 'PELANGGAN');
 $alamat  = $c['alamat'] ?? '-';
-$tarif   = $c['id_tarif'] ?? '-';
 $mawal   = $e['meter_awal'] ?? '0';
 $makhir  = $e['meter_akhir'] ?? '0';
-$total   = (float)$row['total'];
-$admin   = (float)$row['biayaadmin'];
-$jumlah  = $total - $admin;
 
 $pdf = new FPDF('L','mm',array(210, 148));
 $pdf->AddPage();
@@ -61,8 +61,9 @@ $pdf->Cell(45,6,'STAND METER    :',0,0); $pdf->Cell(0,6, $mawal . ' - ' . $makhi
 
 $pdf->Cell(0,2,str_repeat('-', 65),0,1,'C');
 
-$pdf->Cell(45,6,'JUMLAH TAGIHAN :',0,0); $pdf->Cell(0,6,'Rp '.number_format($jumlah,0,',','.'),0,1);
+$pdf->Cell(45,6,'JUMLAH TAGIHAN :',0,0); $pdf->Cell(0,6,'Rp '.number_format($tagihan_murni,0,',','.'),0,1);
 $pdf->Cell(45,6,'BIAYA ADMIN    :',0,0); $pdf->Cell(0,6,'Rp '.number_format($admin,0,',','.'),0,1);
+
 $pdf->SetFont('Courier','B',12);
 $pdf->Cell(45,8,'TOTAL BAYAR    :',0,0); $pdf->Cell(0,8,'Rp '.number_format($total,0,',','.'),0,1);
 

@@ -58,6 +58,11 @@ $query = mysqli_query($koneksi, "SELECT payment_pembayaran.*, payment_pelanggan.
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             <?php 
             while ($row = mysqli_fetch_array($query)) { 
+                $biaya_admin = 2500; 
+                
+                $total_tampilan = $row['total'] + $biaya_admin;
+                
+                
             ?>
             <div class="card-item bg-zinc-900 border border-zinc-800 rounded-3xl p-6 relative overflow-hidden group hover:border-emerald-500/30 transition-all flex flex-col justify-between">
                 <div>
@@ -96,11 +101,11 @@ $query = mysqli_query($koneksi, "SELECT payment_pembayaran.*, payment_pelanggan.
                     <div class="space-y-2 mb-6">
                         <div class="flex justify-between items-center text-xs">
                             <span class="text-zinc-500">Biaya Admin</span>
-                            <span class="text-zinc-300 font-mono">Rp <?= number_format($row['biayaadmin'], 0, ',', '.'); ?></span>
+                            <span class="text-zinc-300 font-mono">Rp <?= number_format($biaya_admin, 0, ',', '.'); ?></span>
                         </div>
                         <div class="flex justify-between items-center pt-2">
                             <span class="text-[10px] text-zinc-100 font-black uppercase tracking-widest">Total Bayar</span>
-                            <span class="text-xl font-black text-emerald-400 font-mono">Rp <?= number_format($row['total'], 0, ',', '.'); ?></span>
+                            <span class="text-xl font-black text-emerald-400 font-mono">Rp <?= number_format($total_tampilan, 0, ',', '.'); ?></span>
                         </div>
                     </div>
                 </div>
