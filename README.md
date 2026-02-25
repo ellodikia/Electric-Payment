@@ -51,7 +51,3 @@ Electro Payment adalah aplikasi berbasis web sederhana untuk mengelola tagihan l
 * `data_...` - Halaman tampilan data (Read).
 * `form_add_...` & `form_edit_...` - Halaman formulir (Create & Update).
 * `insert_...`, `update_...`, `delete_...` - Logika pemrosesan database.
-
-## 📜 Lisensi
-
-Proyek ini dilisensikan di bawah [MIT License](license.txt).
